@@ -7,14 +7,23 @@ def emotion_detector(text_to_analyse):
     header = {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
     response = requests.post(url, json = myobj, headers = header)
     formatted_response = json.loads(response.text)
-    anger = formatted_response['emotionPredictions'][0]['emotion']['anger']
-    disgust = formatted_response['emotionPredictions'][0]['emotion']['disgust']
-    fear = formatted_response['emotionPredictions'][0]['emotion']['fear']
-    sadness = formatted_response['emotionPredictions'][0]['emotion']['sadness']
-    joy = formatted_response['emotionPredictions'][0]['emotion']['joy']
-    emotions = formatted_response['emotionPredictions'][0]['emotion']
-    dominant_emotion = max(emotions, key=emotions.get)
-    return {'anger':anger, 'disgust':disgust, 'fear':fear, 'joy':joy, 'sadness':sadness,  'dominant_emotion': dominant_emotion}
 
-a = emotion_detector("I am glad this happened")
-print(a['dominant_emotion'])
+    # if the response status code is 200 extract the values
+    if response.status_code == 200: 
+        anger = formatted_response['emotionPredictions'][0]['emotion']['anger']
+        disgust = formatted_response['emotionPredictions'][0]['emotion']['disgust']
+        fear = formatted_response['emotionPredictions'][0]['emotion']['fear']
+        sadness = formatted_response['emotionPredictions'][0]['emotion']['sadness']
+        joy = formatted_response['emotionPredictions'][0]['emotion']['joy']
+        emotions = formatted_response['emotionPredictions'][0]['emotion']
+        dominant_emotion = max(emotions, key=emotions.get)
+    #if the response status code is 400, set values to None
+    elif response.status_code == 400 or 500:
+        anger = None
+        disgust = None
+        fear = None
+        sadness = None
+        joy = None
+        emotions = None
+        dominant_emotion = None
+    return {'anger':anger, 'disgust':disgust, 'fear':fear, 'joy':joy, 'sadness':sadness,  'dominant_emotion': dominant_emotion}
